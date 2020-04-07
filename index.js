@@ -1,9 +1,24 @@
+const TODO_ADD = 'TODO_ADD';
+const TODO_TOGGLE = 'TODO_TOGGLE';
+
+const action = {
+  type: TODO_ADD,
+  todo: {id: '0', name: 'learn redux'}
+};
+
+const toggleTodoAction = {
+  type: TODO_TOGGLE,
+  todo: { id: '0'}
+}
+
+
+
 function reducer(state, action) {
   switch(action.type) {
-    case 'TODO_ADD' : {
+    case TODO_ADD : {
       return applyAddTodo(state, action);
     }
-    case 'TODO_TOGGLE' : {
+    case TODO_TOGGLE : {
       return applyToggleTodo(state, action);
     }
     default : return state;
@@ -11,7 +26,8 @@ function reducer(state, action) {
 }
 
 function applyAddTodo(state, action) {
-  return state.concat(action.todo);
+  const todo = Object.assign({}, action.todo, { completed: false});
+  return state.concat(todo);
 }
 
 function applyToggleTodo(state, action) {
@@ -20,6 +36,20 @@ function applyToggleTodo(state, action) {
       ? Object.assign({}, todo, { completed: !todo.completed })
       : todo
   );
+}
+
+function doAddTodo(id, name){
+  return {
+    type: TODO_ADD,
+    todo: { id, name },
+  };
+}
+
+function doToggleTodo(id){
+  return {
+    type: TODO_TOGGLE,
+    todo: { id },
+  };
 }
 
 const store = Redux.createStore(reducer, []);
@@ -32,19 +62,10 @@ const unsubscribe = store.subscribe(() => {
   console.log(store.getState());
 });
 
-store.dispatch({
-  type: 'TODO_ADD',
-  todo: { id: '0', name: 'learn redux', completed: false },
-});
+store.dispatch(doAddTodo('0', 'learn redux'));
 
-store.dispatch({
-  type: 'TODO_ADD',
-  todo: { id: '1', name: 'learn mobx', completed: false },
-});
+store.dispatch(doAddTodo('1', 'learn mobx'));
 
-store.dispatch({
-  type: 'TODO_TOGGLE',
-  todo: { id: '0' },
-});
+store.dispatch(doToggleTodo('0'));
 
 unsubscribe();
