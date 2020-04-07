@@ -1,19 +1,8 @@
 const TODO_ADD = 'TODO_ADD';
 const TODO_TOGGLE = 'TODO_TOGGLE';
+const FILTER_SET = 'FILTER_SET';
 
-const action = {
-  type: TODO_ADD,
-  todo: {id: '0', name: 'learn redux'}
-};
-
-const toggleTodoAction = {
-  type: TODO_TOGGLE,
-  todo: { id: '0'}
-}
-
-
-
-function reducer(state, action) {
+function todoReducer(state = [], action) {
   switch(action.type) {
     case TODO_ADD : {
       return applyAddTodo(state, action);
@@ -38,6 +27,19 @@ function applyToggleTodo(state, action) {
   );
 }
 
+function filterReducer(state = 'SHOW_ALL', action){
+  switch (action.type) {
+    case FILTER_SET: {
+      return applySetFilter(state, action);
+    }
+    default: return state;
+  }
+}
+
+function applySetFilter(state, action) {
+  return action.filter;
+}
+
 function doAddTodo(id, name){
   return {
     type: TODO_ADD,
@@ -52,7 +54,19 @@ function doToggleTodo(id){
   };
 }
 
-const store = Redux.createStore(reducer, []);
+function doSetFilter(filter) {
+  return {
+    type: FILTER_SET,
+    filter,
+  }
+}
+
+const rootReducer = Redux.combineReducers({
+  todoState: todoReducer,
+  filterState: filterReducer,
+});
+
+const store = Redux.createStore(rootReducer);
 
 console.log('initial state:');
 console.log(store.getState());
@@ -63,9 +77,8 @@ const unsubscribe = store.subscribe(() => {
 });
 
 store.dispatch(doAddTodo('0', 'learn redux'));
-
 store.dispatch(doAddTodo('1', 'learn mobx'));
-
 store.dispatch(doToggleTodo('0'));
+store.dispatch(doSetFilter('COMPLETED'));
 
 unsubscribe();
